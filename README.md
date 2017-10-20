@@ -1,6 +1,8 @@
 # ExtendedEdges
 A simple and easy way to play with `safeAreaLayoutGuide` and keep your custom views layout properly on iPhone X.
 
+Demo video: [YouTube](https://youtu.be/Wp9C1b0r3BA)
+
 
 ## Requirement
 - Xcode 9.0+
