@@ -1,5 +1,5 @@
 # ExtendedEdges
-A simple and easy way to play with `safeAreaLayoutGuide` and keep your views layout properly on iPhone X's display.
+A simple and easy way to play with `safeAreaLayoutGuide` and keep your views layout properly on iPhone X'.
 
 
 ## Requirement
@@ -14,7 +14,7 @@ A simple and easy way to play with `safeAreaLayoutGuide` and keep your views lay
 
 ## Usage
 The APIs are simple.
-Use 2 properties to configure extended edges, and (optional) use 2 properties to configure separator.
+Use 2 properties to configure extended edges, and 2 (optional) properties to configure separator.
 
 ``` swift
 public extension UIView {
