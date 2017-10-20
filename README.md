@@ -1,5 +1,5 @@
 # ExtendedEdges
-A simple and easy way to play with `safeAreaLayoutGuide` and keep your views layout properly on iPhone X'.
+A simple and easy way to play with `safeAreaLayoutGuide` and keep your custom views layout properly on iPhone X.
 
 
 ## Requirement
