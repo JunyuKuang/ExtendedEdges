@@ -9,12 +9,13 @@ Demo video: [YouTube](https://youtu.be/Wp9C1b0r3BA)
 - Swift 4.0+
 - iOS 9.0+
 
+
 ## Installation
 1. Download the project
 2. Open the project, then drag the `UIView+ExtendedEdges.swift` file into your project.
 
 
-## Usage
+## Usages
 The APIs are simple.
 Use 2 properties to configure extended edges, and 2 (optional) properties to configure separator.
 Check `ViewController.swift` in project for detail usages.
@@ -57,6 +58,28 @@ public extension UIView {
     /// The default value is a view with background color `UIColor.black.withAlphaComponent(0.3)` (iOS standard separator color).
     public var separator: UIView { get set }
 }
+```
+
+### Example
+``` swift
+let yourCustomToolbar = UIView()
+view.addSubview(yourCustomToolbar)
+
+// configure Auto Layout constraints
+yourCustomToolbar.translatesAutoresizingMaskIntoConstraints = false
+NSLayoutConstraint.activate([
+    yourCustomToolbar.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+    yourCustomToolbar.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+    yourCustomToolbar.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor),
+    yourCustomToolbar.heightAnchor.constraint(equalToConstant: 64),
+    ])
+
+// configure extended edges and background view
+yourCustomToolbar.extendedEdges = [.leading, .trailing, .bottom]
+yourCustomToolbar.backgroundViewForEdgeExtension = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+
+// add a separator to view's top edge
+yourCustomToolbar.separatorEdge = .top
 ```
 
 # License - MIT
