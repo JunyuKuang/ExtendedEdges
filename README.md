@@ -17,6 +17,7 @@ Demo video: [YouTube](https://youtu.be/Wp9C1b0r3BA)
 ## Usage
 The APIs are simple.
 Use 2 properties to configure extended edges, and 2 (optional) properties to configure separator.
+Check `ViewController.swift` in project for detail usages.
 
 ``` swift
 public extension UIView {
