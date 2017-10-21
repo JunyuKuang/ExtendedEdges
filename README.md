@@ -1,5 +1,5 @@
 # ExtendedEdges
-A simple and easy way to play with `safeAreaLayoutGuide` and keep your custom views layout properly on iPhone X.
+A simple and easy way to keep your custom views layout properly on iPhone X.
 
 Demo video: [YouTube](https://youtu.be/Wp9C1b0r3BA)
 
@@ -23,7 +23,7 @@ Check `ViewController.swift` in project for detail usages.
 ``` swift
 public extension UIView {
 
-    public enum Edge {
+    enum Edge {
         case top
         case leading
         case trailing
@@ -36,12 +36,12 @@ public extension UIView {
     /// The view's edges that need to extended.
     ///
     /// The default value is an empty set, which means not extend any edges.
-    public var extendedEdges: Set<Edge> { get set }
+    var extendedEdges: Set<Edge> { get set }
 
     /// The view's background view that extend to outside of the `safeAreaLayoutGuide`.
     ///
     /// The default value is a view with clear background color.
-    public var backgroundViewForEdgeExtension: UIView { get set }
+    var backgroundViewForEdgeExtension: UIView { get set }
 }
 
 public extension UIView {
@@ -51,12 +51,12 @@ public extension UIView {
     /// Default value is `Edge.top`, which means place separator at the view's top edge.
     ///
     /// Set a new value will create and add a new separator to the view if current don't have one.
-    public var separatorEdge: Edge { get set }
+    var separatorEdge: Edge { get set }
 
     /// The separator view for indicated `separatorEdge`.
     ///
     /// The default value is a view with background color `UIColor.black.withAlphaComponent(0.3)` (iOS standard separator color).
-    public var separator: UIView { get set }
+    var separator: UIView { get set }
 }
 ```
 
