@@ -40,7 +40,7 @@ public extension UIView {
     /// The view's edges that need to extended.
     ///
     /// The default value is an empty set, which means not extend any edges.
-    public var extendedEdges: Set<Edge> {
+    var extendedEdges: Set<Edge> {
         get {
             return edgeExtendedLayoutGuide.extendedEdges
         }
@@ -49,10 +49,10 @@ public extension UIView {
         }
     }
     
-    /// The view's background view that extend to outside of the `safeAreaLayoutGuide`.
+    /// The view's background view that extend to superview's edge.
     ///
     /// The default value is a view with clear background color.
-    public var backgroundViewForEdgeExtension: UIView {
+    var backgroundViewForEdgeExtension: UIView {
         get {
             if let view = subviews.first(where: { $0.isBackgroundView }) {
                 return view
@@ -99,12 +99,12 @@ public extension UIView {
     /// Default value is `Edge.top`, which means place separator at the view's top edge.
     ///
     /// Set a new value will create and add a new separator to the view if current don't have one.
-    public var separatorEdge: Edge {
+    var separatorEdge: Edge {
         get {
-            return separatorLayoutGuide.extendedEdge
+            return separatorLayoutGuide.attachedEdge
         }
         set {
-            separatorLayoutGuide.extendedEdge = newValue
+            separatorLayoutGuide.attachedEdge = newValue
             _ = separator // create and add a new separator if current don't have one
         }
     }
@@ -112,12 +112,13 @@ public extension UIView {
     /// The separator view for indicated `separatorEdge`.
     ///
     /// The default value is a view with background color `UIColor.black.withAlphaComponent(0.3)` (iOS standard separator color).
-    public var separator: UIView {
+    var separator: UIView {
         get {
             if let view = subviews.first(where: { $0.isSeparator }) {
                 return view
             }
             let defaultView = SeparatorView()
+            defaultView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
             self.separator = defaultView
             return defaultView
         }
@@ -152,30 +153,9 @@ public extension UIView {
 
 
 // MARK: - Private Views
-private class EdgeExtendedBackgroundView : UIView {
-    
-    init() {
-        super.init(frame: .zero)
-        isUserInteractionEnabled = false
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
+private class EdgeExtendedBackgroundView : UIView {}
 
-private class SeparatorView : UIView {
-    
-    init() {
-        super.init(frame: .zero)
-        isUserInteractionEnabled = false
-        backgroundColor = UIColor.black.withAlphaComponent(0.3)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
+private class SeparatorView : UIView {}
 
 
 // MARK: - Private Helper
@@ -218,8 +198,8 @@ private class EdgeExtendedLayoutGuide : UILayoutGuide {
         var bottom: NSLayoutConstraint?
         
         func deactiveAll() {
-            let allEdges: [UIView.Edge] = [.leading, .top, .trailing, .bottom]
-            allEdges.flatMap(constraint).forEach { $0.isActive = false }
+            let constraints = [leading, top, trailing, bottom].flatMap { $0 }
+            NSLayoutConstraint.deactivate(constraints)
         }
         
         func constraint(at edge: UIView.Edge) -> NSLayoutConstraint? {
@@ -234,9 +214,9 @@ private class EdgeExtendedLayoutGuide : UILayoutGuide {
     
     private var viewMarginConstraints = Constraints(leading: nil, top: nil, trailing: nil, bottom: nil)
     
-    private var windowMarginConstraints = Constraints(leading: nil, top: nil, trailing: nil, bottom: nil)
+    private var superviewMarginConstraints = Constraints(leading: nil, top: nil, trailing: nil, bottom: nil)
     
-    private var viewDidMoveToWindowObserver: Any? {
+    private var viewDidMoveToSuperviewObserver: Any? {
         didSet {
             guard let observer = oldValue else { return }
             NotificationCenter.default.removeObserver(observer)
@@ -244,7 +224,7 @@ private class EdgeExtendedLayoutGuide : UILayoutGuide {
     }
     
     deinit {
-        guard let observer = viewDidMoveToWindowObserver else { return }
+        guard let observer = viewDidMoveToSuperviewObserver else { return }
         NotificationCenter.default.removeObserver(observer)
     }
     
@@ -253,17 +233,17 @@ private class EdgeExtendedLayoutGuide : UILayoutGuide {
             guard let view = owningView else { return }
             updateConstraints()
             
-            viewDidMoveToWindowObserver = NotificationCenter.default.addObserver(forName: .viewDidMoveToWindow, object: view, queue: .main) { [weak self] _ in
+            viewDidMoveToSuperviewObserver = NotificationCenter.default.addObserver(forName: .viewDidMoveToSuperview, object: view, queue: .main) { [weak self, weak view] _ in
+                guard view?.superview != nil else { return }
                 self?.updateConstraints()
             }
             
             struct Swizzle {
-                static let perform: Bool = {
+                static let perform: Void = {
                     method_exchangeImplementations(
-                        class_getInstanceMethod(UIView.self, #selector(UIView.didMoveToWindow))!,
-                        class_getInstanceMethod(UIView.self, #selector(UIView.eelg_didMoveToWindow))!
+                        class_getInstanceMethod(UIView.self, #selector(UIView.didMoveToSuperview))!,
+                        class_getInstanceMethod(UIView.self, #selector(UIView.eelg_swizzle_didMoveToSuperview))!
                     )
-                    return true
                 }()
             }
             _ = Swizzle.perform
@@ -282,33 +262,33 @@ private class EdgeExtendedLayoutGuide : UILayoutGuide {
             viewMarginConstraints.bottom = bottomAnchor.constraint(equalTo: view.bottomAnchor)
         }
         
-        if let window = view.window, windowMarginConstraints.leading == nil || windowMarginConstraints.leading?.secondItem as? UIWindow != window {
-            windowMarginConstraints.deactiveAll()
+        if let superview = view.superview, superviewMarginConstraints.leading == nil || superviewMarginConstraints.leading?.secondItem as? UIView != superview {
+            superviewMarginConstraints.deactiveAll()
             
-            windowMarginConstraints.leading = leadingAnchor.constraint(equalTo: window.leadingAnchor)
-            windowMarginConstraints.top = topAnchor.constraint(equalTo: window.topAnchor)
-            windowMarginConstraints.trailing = trailingAnchor.constraint(equalTo: window.trailingAnchor)
-            windowMarginConstraints.bottom = bottomAnchor.constraint(equalTo: window.bottomAnchor)
+            superviewMarginConstraints.leading = leadingAnchor.constraint(equalTo: superview.leadingAnchor)
+            superviewMarginConstraints.top = topAnchor.constraint(equalTo: superview.topAnchor)
+            superviewMarginConstraints.trailing = trailingAnchor.constraint(equalTo: superview.trailingAnchor)
+            superviewMarginConstraints.bottom = bottomAnchor.constraint(equalTo: superview.bottomAnchor)
         }
         
         let allEdges: [UIView.Edge] = [.leading, .top, .trailing, .bottom]
         
         for edge in allEdges {
             guard let viewMarginConstraint = viewMarginConstraints.constraint(at: edge) else { continue }
-            let windowMarginConstraint = windowMarginConstraints.constraint(at: edge)
+            let superviewMarginConstraint = superviewMarginConstraints.constraint(at: edge)
             
-            let extendToEdge = view.window != nil && windowMarginConstraint != nil && extendedEdges.contains(edge)
+            let extendToEdge = view.superview != nil && superviewMarginConstraint != nil && extendedEdges.contains(edge)
             
             if extendToEdge {
                 if viewMarginConstraint.isActive {
                     viewMarginConstraint.isActive = false
                 }
-                if let windowMarginConstraint = windowMarginConstraint, !windowMarginConstraint.isActive {
-                    windowMarginConstraint.isActive = true
+                if let superviewMarginConstraint = superviewMarginConstraint, !superviewMarginConstraint.isActive {
+                    superviewMarginConstraint.isActive = true
                 }
             } else {
-                if let windowMarginConstraint = windowMarginConstraint, windowMarginConstraint.isActive {
-                    windowMarginConstraint.isActive = false
+                if let superviewMarginConstraint = superviewMarginConstraint, superviewMarginConstraint.isActive {
+                    superviewMarginConstraint.isActive = false
                 }
                 if !viewMarginConstraint.isActive {
                     viewMarginConstraint.isActive = true
@@ -319,23 +299,22 @@ private class EdgeExtendedLayoutGuide : UILayoutGuide {
 }
 
 @objc private extension UIView {
-    func eelg_didMoveToWindow() {
-        NotificationCenter.default.post(name: .viewDidMoveToWindow, object: self)
-        eelg_didMoveToWindow()
+    func eelg_swizzle_didMoveToSuperview() {
+        NotificationCenter.default.post(name: .viewDidMoveToSuperview, object: self)
+        eelg_swizzle_didMoveToSuperview()
     }
 }
 
 private extension Notification.Name {
-    static let viewDidMoveToWindow = Notification.Name("EALGViewDidMoveToWindowNotification")
+    static let viewDidMoveToSuperview = Notification.Name("EELGViewDidMoveToSuperviewNotification")
 }
-
 
 // MARK: - SeparatorLayoutGuide
 private class SeparatorLayoutGuide : UILayoutGuide {
     
-    var extendedEdge: UIView.Edge = .top {
+    var attachedEdge: UIView.Edge = .top {
         didSet {
-            if extendedEdge != oldValue {
+            if attachedEdge != oldValue {
                 updateConstraints()
             }
         }
@@ -354,42 +333,41 @@ private class SeparatorLayoutGuide : UILayoutGuide {
     private func updateConstraints() {
         guard let view = owningView else { return }
         
-        constraints.forEach { $0.isActive = false }
-        constraints.removeAll()
+        NSLayoutConstraint.deactivate(constraints)
+        defer { NSLayoutConstraint.activate(constraints) }
         
         let edgeLayoutGuide = view.edgeExtendedLayoutGuide
+        let separatorWidth = SeparatorLayoutGuide.separatorWidth
         
-        switch extendedEdge {
+        switch attachedEdge {
         case .leading:
             constraints = [
                 trailingAnchor.constraint(equalTo: edgeLayoutGuide.leadingAnchor),
                 topAnchor.constraint(equalTo: edgeLayoutGuide.topAnchor),
                 bottomAnchor.constraint(equalTo: edgeLayoutGuide.bottomAnchor),
-                widthAnchor.constraint(equalToConstant: SeparatorLayoutGuide.separatorWidth),
+                widthAnchor.constraint(equalToConstant: separatorWidth),
             ]
         case .top:
             constraints = [
                 bottomAnchor.constraint(equalTo: edgeLayoutGuide.topAnchor),
                 leadingAnchor.constraint(equalTo: edgeLayoutGuide.leadingAnchor),
                 trailingAnchor.constraint(equalTo: edgeLayoutGuide.trailingAnchor),
-                heightAnchor.constraint(equalToConstant: SeparatorLayoutGuide.separatorWidth),
+                heightAnchor.constraint(equalToConstant: separatorWidth),
             ]
         case .trailing:
             constraints = [
                 leadingAnchor.constraint(equalTo: edgeLayoutGuide.trailingAnchor),
                 topAnchor.constraint(equalTo: edgeLayoutGuide.topAnchor),
                 bottomAnchor.constraint(equalTo: edgeLayoutGuide.bottomAnchor),
-                widthAnchor.constraint(equalToConstant: SeparatorLayoutGuide.separatorWidth),
+                widthAnchor.constraint(equalToConstant: separatorWidth),
             ]
         case .bottom:
             constraints = [
                 topAnchor.constraint(equalTo: edgeLayoutGuide.bottomAnchor),
                 leadingAnchor.constraint(equalTo: edgeLayoutGuide.leadingAnchor),
                 trailingAnchor.constraint(equalTo: edgeLayoutGuide.trailingAnchor),
-                heightAnchor.constraint(equalToConstant: SeparatorLayoutGuide.separatorWidth),
+                heightAnchor.constraint(equalToConstant: separatorWidth),
             ]
         }
-        
-        constraints.forEach { $0.isActive = true }
     }
 }
