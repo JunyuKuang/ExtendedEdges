@@ -38,7 +38,7 @@ public extension UIView {
     /// The default value is an empty set, which means not extend any edges.
     var extendedEdges: Set<Edge> { get set }
 
-    /// The view's background view that extend to outside of the `safeAreaLayoutGuide`.
+    /// The view's background view that extend to superview's edge.
     ///
     /// The default value is a view with clear background color.
     var backgroundViewForEdgeExtension: UIView { get set }
