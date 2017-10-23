@@ -45,9 +45,9 @@ class ViewController: UIViewController {
         buttonBar.backgroundViewForEdgeExtension = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
         
         buttonBar.translatesAutoresizingMaskIntoConstraints = false
-        barAdjustmentConstraints = BarAdjustmentConstraints(top: buttonBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+        barAdjustmentConstraints = BarAdjustmentConstraints(top: buttonBar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
                                                             center: buttonBar.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-                                                            bottom: buttonBar.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor))
+                                                            bottom: buttonBar.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor))
         NSLayoutConstraint.activate([
             buttonBar.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             buttonBar.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
