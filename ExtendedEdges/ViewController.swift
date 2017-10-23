@@ -102,7 +102,7 @@ class ViewController: UIViewController {
         let bottom: NSLayoutConstraint
         
         func deactiveAll() {
-            [top, center, bottom].forEach { $0.isActive = false }
+            NSLayoutConstraint.deactivate([top, center, bottom])
         }
     }
     
@@ -115,26 +115,22 @@ class ViewController: UIViewController {
     private var barPosition = BarPosition.bottom {
         didSet {
             self.buttonBar.superview?.layoutIfNeeded()
+            
             performAnimations {
                 self.barAdjustmentConstraints?.deactiveAll()
-                
-                [self.buttonForTopLayout, self.buttonForCenterLayout, self.buttonForBottomLayout].forEach { $0.isEnabled = true }
                 
                 switch self.barPosition {
                 case .top:
                     self.buttonBar.extendedEdges = [.leading, .trailing, .top]
                     self.barAdjustmentConstraints?.top.isActive = true
-                    self.buttonForTopLayout.isEnabled = false
                     
                 case .center:
                     self.buttonBar.extendedEdges = [.leading, .trailing]
                     self.barAdjustmentConstraints?.center.isActive = true
-                    self.buttonForCenterLayout.isEnabled = false
                     
                 case .bottom:
                     self.buttonBar.extendedEdges = [.leading, .trailing, .bottom]
                     self.barAdjustmentConstraints?.bottom.isActive = true
-                    self.buttonForBottomLayout.isEnabled = false
                 }
                 
                 self.buttonBar.superview?.layoutIfNeeded()
