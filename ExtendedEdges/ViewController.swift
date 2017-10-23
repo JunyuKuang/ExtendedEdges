@@ -138,7 +138,6 @@ class ViewController: UIViewController {
                 }
                 
                 self.buttonBar.superview?.layoutIfNeeded()
-                self.setNeedsStatusBarAppearanceUpdate()
             }
         }
     }
