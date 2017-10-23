@@ -35,10 +35,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		FB940D471F9DDC9900F443CC /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				FBE5279C1F99ECF000B2E348 /* UIView+ExtendedEdges.swift */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
 		FBE5277E1F99ECE800B2E348 = {
 			isa = PBXGroup;
 			children = (
-				FBE527891F99ECE900B2E348 /* ExtendedEdges */,
+				FB940D471F9DDC9900F443CC /* Source */,
+				FBE527891F99ECE900B2E348 /* Sample */,
 				FBE527881F99ECE900B2E348 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -51,17 +60,16 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		FBE527891F99ECE900B2E348 /* ExtendedEdges */ = {
+		FBE527891F99ECE900B2E348 /* Sample */ = {
 			isa = PBXGroup;
 			children = (
 				FBE5278A1F99ECE900B2E348 /* AppDelegate.swift */,
 				FBE5278C1F99ECE900B2E348 /* ViewController.swift */,
-				FBE5279C1F99ECF000B2E348 /* UIView+ExtendedEdges.swift */,
 				FBE527911F99ECE900B2E348 /* Assets.xcassets */,
 				FBE5279E1F99ECFA00B2E348 /* LaunchScreen.storyboard */,
 				FBE527961F99ECE900B2E348 /* Info.plist */,
 			);
-			path = ExtendedEdges;
+			path = Sample;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -257,7 +265,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FF973S8UP2;
-				INFOPLIST_FILE = ExtendedEdges/Info.plist;
+				INFOPLIST_FILE = Sample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jonny.ExtendedEdges;
@@ -273,7 +281,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FF973S8UP2;
-				INFOPLIST_FILE = ExtendedEdges/Info.plist;
+				INFOPLIST_FILE = Sample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jonny.ExtendedEdges;
