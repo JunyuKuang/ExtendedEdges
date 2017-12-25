@@ -1,5 +1,5 @@
 # ExtendedEdges
-A simple and easy way to keep your custom views layout properly on iPhone X.
+A simple and easy way to keep your custom views properly layout on iPhone X.
 
 Demo video: [YouTube](https://youtu.be/Wp9C1b0r3BA)
 
